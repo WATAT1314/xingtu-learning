@@ -1,0 +1,24 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: xingtu-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "1234"
+      MYSQL_DATABASE: xingtu_learning
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./sql/data.sql:/docker-entrypoint-initdb.d/02-data.sql:ro
+      - xingtu-mysql-data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+
+  redis:
+    image: redis:7-alpine
+    container_name: xingtu-redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  xingtu-mysql-data:

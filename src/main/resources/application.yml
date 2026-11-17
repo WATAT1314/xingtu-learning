@@ -1,0 +1,38 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: xingtu-learning
+  datasource:
+    url: jdbc:mysql://localhost:3306/xingtu_learning?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      database: 3
+      timeout: 3000ms
+
+# 业务参数
+xingtu:
+  learning:
+    # 学习记录合并写入的延迟时间（秒）
+    record-delay-seconds: 5
+    # 学完一节课获得的积分
+    finish-points: 2
+  like:
+    # 点赞计数批量落库间隔（毫秒）
+    sync-interval-ms: 10000
+  points:
+    # 连续签到基础积分
+    sign-points: 2
+
+logging:
+  level:
+    com.xingtu: info

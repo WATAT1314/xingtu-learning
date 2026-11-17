@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>星途学堂 · 学习中心</title>
+<style>
+  :root {
+    --bg: #0A1628; --bg2: #0F2036; --card: #142A42; --card-line: #1E4262;
+    --teal: #14B8A6; --teal-deep: #0E9384; --gold: #F0B429;
+    --text: #E8F4F2; --muted: #8FB0C4; --radius: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Microsoft YaHei", sans-serif; background: linear-gradient(160deg, var(--bg), var(--bg2) 60%, #0D2A3E); color: var(--text); min-height: 100vh; padding-bottom: 60px; }
+  header { padding: 22px 40px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(30,66,98,.6); background: rgba(10,22,40,.85); position: sticky; top: 0; backdrop-filter: blur(8px); z-index: 10; }
+  .brand { display: flex; align-items: center; gap: 14px; cursor: pointer; }
+  .brand-mark { width: 42px; height: 42px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #1FC9B4, var(--teal-deep) 70%); display: flex; align-items: center; justify-content: center; font-size: 19px; box-shadow: 0 0 16px rgba(20,184,166,.5); }
+  .brand h1 { font-size: 21px; letter-spacing: 2px; }
+  .brand small { display: block; font-size: 12px; color: var(--muted); font-weight: normal; letter-spacing: 4px; }
+  .stats { display: flex; gap: 22px; font-size: 13px; color: var(--muted); }
+  .stats b { color: var(--gold); font-size: 17px; margin-right: 4px; }
+  main { max-width: 1080px; margin: 26px auto; padding: 0 30px; }
+  section { margin-bottom: 32px; }
+  h2 { font-size: 17px; margin-bottom: 14px; padding-left: 12px; border-left: 4px solid var(--teal); letter-spacing: 1px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 16px; }
+  .card { background: var(--card); border: 1px solid var(--card-line); border-radius: var(--radius); padding: 20px 22px; transition: transform .18s, box-shadow .18s; }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 8px 26px rgba(20,184,166,.16); }
+  .card h3 { font-size: 16px; margin-bottom: 8px; color: #fff; }
+  .card .meta { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+  .bar { height: 8px; background: #0B1B2E; border-radius: 6px; overflow: hidden; margin-bottom: 6px; }
+  .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--teal-deep), var(--teal)); transition: width .5s; }
+  .pct { font-size: 12px; color: var(--teal); }
+  button { padding: 9px 18px; border: 0; border-radius: 8px; background: linear-gradient(90deg, var(--teal-deep), var(--teal)); color: #fff; font-size: 13px; cursor: pointer; transition: filter .15s; }
+  button:hover { filter: brightness(1.12); }
+  button.ghost { background: transparent; border: 1px solid var(--card-line); color: var(--muted); }
+  button.ghost:hover { border-color: var(--teal); color: var(--teal); }
+  button:disabled { background: #23364a; color: var(--muted); cursor: default; }
+
+  /* 标签 */
+  .tabs { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+  .tab { width: auto; padding: 10px 22px; background: transparent; border: 1px solid var(--card-line); border-radius: 24px; color: var(--muted); font-size: 14px; }
+  .tab.active { background: linear-gradient(90deg, var(--teal-deep), var(--teal)); color: #fff; border-color: transparent; }
+
+  /* 课程封面卡 */
+  .course-card { cursor: pointer; }
+  .course-cover { font-size: 44px; margin-bottom: 8px; }
+  .course-tags { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 12px; }
+  .course-tags span { font-size: 11px; padding: 3px 10px; border-radius: 10px; background: rgba(20,184,166,.12); color: var(--teal); }
+  .course-level { float: right; font-size: 11px; color: var(--gold); border: 1px solid rgba(240,180,41,.4); padding: 2px 10px; border-radius: 10px; }
+
+  /* 课程详情页 */
+  .detail-head { display: flex; gap: 20px; align-items: flex-start; background: var(--card); border: 1px solid var(--card-line); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
+  .detail-head .cover { font-size: 58px; line-height: 1; }
+  .detail-head .info { flex: 1; }
+  .detail-head h2 { border: 0; padding: 0; margin-bottom: 8px; font-size: 22px; }
+  .detail-head .summary { color: var(--muted); font-size: 13px; line-height: 1.7; margin-bottom: 10px; }
+  .back-btn { margin-bottom: 16px; }
+
+  /* 章节列表 */
+  .sec-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: var(--card); border: 1px solid var(--card-line); border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: border-color .15s, transform .15s; }
+  .sec-item:hover { border-color: var(--teal); transform: translateX(4px); }
+  .sec-item .idx { width: 34px; height: 34px; flex: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #1B3A55; color: var(--muted); font-weight: bold; font-size: 13px; }
+  .sec-item.done .idx { background: linear-gradient(135deg, var(--teal-deep), var(--teal)); color: #fff; }
+  .sec-item .t { flex: 1; }
+  .sec-item .t b { font-size: 14px; }
+  .sec-item .t p { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .sec-item .flag { font-size: 13px; }
+  .sec-item.done .flag { color: var(--teal); }
+
+  /* 章节阅读页 */
+  .reader { background: var(--card); border: 1px solid var(--card-line); border-radius: var(--radius); padding: 30px 34px; }
+  .reader h2 { border: 0; padding: 0; margin-bottom: 4px; font-size: 21px; }
+  .reader .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+  .md { line-height: 1.9; font-size: 14.5px; color: #d5e5ea; }
+  .md h3 { font-size: 16px; margin: 20px 0 10px; color: var(--teal); }
+  .md p { margin-bottom: 12px; }
+  .md pre { background: #0B1628; border: 1px solid var(--card-line); border-radius: 10px; padding: 14px 18px; overflow-x: auto; margin: 14px 0; font-size: 13px; line-height: 1.6; }
+  .md code { font-family: Consolas, monospace; }
+  .md p code, .md li code { background: #0B1628; padding: 2px 6px; border-radius: 4px; font-size: 12.5px; color: var(--gold); }
+  .md table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 13px; }
+  .md th, .md td { border: 1px solid var(--card-line); padding: 8px 12px; text-align: left; }
+  .md th { background: #0B1B2E; color: var(--teal); }
+  .md blockquote { border-left: 3px solid var(--gold); padding: 8px 16px; background: rgba(240,180,41,.06); color: #e8d9b0; margin: 14px 0; border-radius: 0 8px 8px 0; }
+  .md ul, .md ol { padding-left: 24px; margin-bottom: 12px; }
+  .md li { margin-bottom: 6px; }
+
+  /* 小测 */
+  .quiz { background: rgba(240,180,41,.05); border: 1px solid rgba(240,180,41,.3); border-radius: 12px; padding: 20px 24px; margin-top: 22px; }
+  .quiz h4 { color: var(--gold); font-size: 15px; margin-bottom: 12px; }
+  .quiz .opt { display: block; padding: 10px 16px; background: var(--card); border: 1px solid var(--card-line); border-radius: 8px; margin-bottom: 8px; cursor: pointer; font-size: 14px; color: var(--text); transition: border-color .15s; }
+  .quiz .opt:hover { border-color: var(--teal); }
+  .quiz .opt.right { border-color: var(--teal); background: rgba(20,184,166,.12); color: var(--teal); }
+  .quiz .opt.wrong { border-color: #E5484D; background: rgba(229,72,77,.10); color: #FF9B9D; }
+  .quiz .result { margin-top: 12px; font-size: 14px; }
+  .quiz .result.ok { color: var(--teal); }
+  .quiz .result.no { color: #FF9B9D; }
+
+  .reader-acts { display: flex; gap: 12px; margin-top: 24px; }
+  .reader-acts button { flex: 1; padding: 13px 0; font-size: 15px; }
+
+  /* Agent */
+  .agent-box { background: var(--card); border: 1px solid var(--card-line); border-radius: var(--radius); padding: 22px; }
+  .agent-q { display: flex; gap: 10px; margin-bottom: 16px; }
+  .agent-q input { flex: 1; background: #0B1B2E; border: 1px solid var(--card-line); color: var(--text); padding: 11px 16px; border-radius: 10px; font-size: 14px; }
+  .agent-q button { width: auto; padding: 0 26px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .chips span { font-size: 12px; padding: 6px 14px; border-radius: 14px; background: rgba(20,184,166,.1); color: var(--teal); cursor: pointer; }
+  .chips span:hover { background: rgba(20,184,166,.22); }
+  .agent-answer { background: #0B1B2E; border-radius: 10px; padding: 16px 20px; font-size: 14px; line-height: 1.8; color: #cfe4e8; white-space: pre-wrap; }
+  .diag-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin: 14px 0; }
+  .diag-grid .item { background: #0B1B2E; border-radius: 10px; padding: 14px; text-align: center; }
+  .diag-grid b { font-size: 22px; color: var(--gold); display: block; }
+  .diag-grid span { font-size: 12px; color: var(--muted); }
+  .diag-list li { margin-bottom: 8px; font-size: 13.5px; color: #cfe4e8; }
+  .diag-list li b { color: var(--teal); }
+
+  .coupon-row { display: flex; align-items: center; padding: 14px 18px; gap: 16px; }
+  .toast { position: fixed; left: 50%; top: 70px; transform: translateX(-50%) translateY(-20px); background: rgba(16,42,60,.95); border: 1px solid var(--teal-deep); color: var(--text); padding: 12px 26px; border-radius: 10px; font-size: 14px; opacity: 0; transition: all .3s; pointer-events: none; z-index: 99; max-width: 80vw; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.err { border-color: #E5484D; color: #FFB4B6; }
+  .foot { text-align: center; color: var(--muted); font-size: 12px; padding-top: 10px; letter-spacing: 2px; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand" onclick="go('home')">
+    <div class="brand-mark">星</div>
+    <div><h1>星途学堂</h1><small>星辰之路 · 学以致用</small></div>
+  </div>
+  <div class="stats">
+    <span><b id="st-courses">-</b>在学课程</span>
+    <span><b id="st-points">-</b>我的积分</span>
+    <span><b id="st-coupons">-</b>可用券</span>
+  </div>
+</header>
+
+<main>
+  <!-- 首页 -->
+  <div id="view-home">
+    <nav class="tabs">
+      <button class="tab active" data-tab="tab-learn" onclick="switchTab('tab-learn')">📚 学习</button>
+      <button class="tab" data-tab="tab-note" onclick="switchTab('tab-note')">📝 学习笔记</button>
+      <button class="tab" data-tab="tab-streak" onclick="switchTab('tab-streak')">🔥 连续打卡</button>
+      <button class="tab" data-tab="tab-badge" onclick="switchTab('tab-badge')">🏅 成就徽章</button>
+      <button class="tab" data-tab="tab-agent" onclick="switchTab('tab-agent')">🤖 学习助手</button>
+    </nav>
+
+    <div id="tab-learn">
+      <section><h2>课程广场（点卡片进入学习）</h2><div class="cards" id="courses">加载中…</div></section>
+      <section><h2>优惠券中心</h2><div class="cards" id="coupons" style="grid-template-columns:1fr">加载中…</div></section>
+      <section><h2>积分排行榜</h2><div id="rank">加载中…</div></section>
+    </div>
+
+    <div id="tab-note" style="display:none">
+      <section><h2>写笔记</h2>
+        <div class="card note-editor">
+          <div class="note-row" style="display:flex;gap:12px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+            <select id="note-lesson" style="background:#0B1B2E;border:1px solid var(--card-line);color:var(--text);padding:8px 12px;border-radius:8px"></select>
+            <input id="note-section" type="number" min="1" placeholder="章节序号" style="width:110px;background:#0B1B2E;border:1px solid var(--card-line);color:var(--text);padding:8px 12px;border-radius:8px">
+            <label style="color:var(--muted);font-size:13px"><input id="note-public" type="checkbox"> 公开到学习广场</label>
+          </div>
+          <textarea id="note-content" rows="4" style="width:100%;background:#0B1B2E;border:1px solid var(--card-line);color:var(--text);padding:12px;border-radius:10px;font-size:14px;margin-bottom:12px" placeholder="记录这章的收获、疑问、思考…"></textarea>
+          <button onclick="saveNote()">保存笔记</button>
+        </div>
+      </section>
+      <section><h2>我的笔记</h2><div class="cards" id="my-notes">加载中…</div></section>
+      <section><h2>学习广场</h2><div class="cards" id="public-notes">加载中…</div></section>
+    </div>
+
+    <div id="tab-streak" style="display:none">
+      <section><h2>今日打卡</h2>
+        <div class="card" style="text-align:center">
+          <div style="display:flex;justify-content:center;gap:60px;margin:12px 0 20px">
+            <div><b id="streak-cur" style="font-size:44px;color:var(--gold)">0</b><div style="font-size:13px;color:var(--muted)">当前连续</div></div>
+            <div><b id="streak-best" style="font-size:44px;color:var(--gold)">0</b><div style="font-size:13px;color:var(--muted)">最长连续</div></div>
+          </div>
+          <button id="btn-checkin" onclick="checkIn()">立即打卡</button>
+        </div>
+      </section>
+      <section><h2>近 30 天打卡日历</h2><div style="display:grid;grid-template-columns:repeat(10,1fr);gap:8px" id="calendar">加载中…</div></section>
+    </div>
+
+    <div id="tab-badge" style="display:none">
+      <section><h2>我的成就墙</h2><div class="cards" id="badges">加载中…</div></section>
+      <section><h2>最近获得</h2><div id="badge-recent">加载中…</div></section>
+    </div>
+
+    <div id="tab-agent" style="display:none">
+      <section><h2>🤖 星途学习助手</h2>
+        <div class="agent-box">
+          <div class="chips">
+            <span onclick="quickAsk('我的学习情况怎么样')">📊 学习诊断</span>
+            <span onclick="quickAsk('接下来我该学什么')">🎯 下一步建议</span>
+            <span onclick="quickAsk('给我一个学习计划')">📅 制定计划</span>
+            <span onclick="quickAsk('分布式锁怎么做')">分布式锁怎么做</span>
+            <span onclick="quickAsk('缓存穿透击穿雪崩')">缓存三大问题</span>
+            <span onclick="quickAsk('Lua 秒杀脚本')">Lua 秒杀</span>
+          </div>
+          <div class="agent-q">
+            <input id="agent-input" placeholder="问我学习问题，或输入课程知识点关键词…" onkeydown="if(event.key==='Enter')askAgent()">
+            <button onclick="askAgent()">提问</button>
+          </div>
+          <div id="agent-result"><div class="agent-answer">我是星途学习助手 🤖 可以帮你：分析学习进度、推荐下一章、制定学习计划、解答课程知识点。点击上方快捷标签或直接输入问题。</div></div>
+        </div>
+      </section>
+      <section><h2>我的学习画像</h2><div id="agent-diag" class="agent-box">加载中…</div></section>
+    </div>
+  </div>
+
+  <!-- 课程详情 -->
+  <div id="view-course" class="hidden">
+    <button class="ghost back-btn" onclick="go('home')">← 返回首页</button>
+    <div id="course-detail">加载中…</div>
+  </div>
+
+  <!-- 章节阅读 -->
+  <div id="view-section" class="hidden">
+    <button class="ghost back-btn" onclick="openCourse(curCourseId)">← 返回课程目录</button>
+    <div id="section-reader">加载中…</div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+<footer class="foot">YUNSHAN EDU · 星途学堂 v2.0</footer>
+
+<script>
+const uid = 1, API = '/api';
+let curCourseId = null, curSections = [];
+
+async function req(url, opt) { return (await fetch(url, opt)).json(); }
+function toast(msg, err) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show' + (err ? ' err' : '');
+  setTimeout(() => t.className = 'toast', 2400);
+}
+function esc(s) { return String(s ?? '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
+function go(v) {
+  ['home', 'course', 'section'].forEach(x => document.getElementById('view-' + x).classList.toggle('hidden', x !== v));
+  window.scrollTo(0, 0);
+}
+function switchTab(id) {
+  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === id));
+  ['tab-learn','tab-note','tab-streak','tab-badge','tab-agent'].forEach(tid =>
+      document.getElementById(tid).style.display = tid === id ? '' : 'none');
+  if (id === 'tab-note') loadNotes();
+  if (id === 'tab-streak') loadStreak();
+  if (id === 'tab-badge') loadBadges();
+  if (id === 'tab-agent') loadDiag();
+}
+
+/* ---------- 简易 Markdown 渲染 ---------- */
+function md(text) {
+  let h = esc(text);
+  h = h.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  h = h.replace(/^## (.+)$/gm, '<h3>$1</h3>');
+  h = h.replace(/```([\s\S]*?)```/g, (_, c) => '<pre><code>' + c.trim() + '</code></pre>');
+  h = h.replace(/`([^`]+)`/g, '<code>$1</code>');
+  h = h.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+  // 表格
+  h = h.replace(/((^\|.*\|\s*$\n?)+)/gm, block => {
+    const rows = block.trim().split('\n').filter(r => !/^\|[\s:-]+\|/.test(r));
+    if (rows.length < 1) return block;
+    const cells = rows.map(r => r.split('|').slice(1, -1).map(c => c.trim()));
+    let t = '<table><tr>' + cells[0].map(c => '<th>' + c + '</th>').join('') + '</tr>';
+    for (let i = 1; i < cells.length; i++) t += '<tr>' + cells[i].map(c => '<td>' + c + '</td>').join('') + '</tr>';
+    return t + '</table>';
+  });
+  h = h.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  h = h.replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>');
+  h = h.replace(/^- (.+)$/gm, '<li>$1</li>');
+  h = h.replace(/(<li>[\s\S]*?<\/li>)(?!\s*<li>)/g, m => m.includes('<ul') ? m : '<ul>' + m + '</ul>');
+  h = h.split(/\n{2,}/).map(p => p.startsWith('<') || p.startsWith('<table') || p.startsWith('<ul') ? p : '<p>' + p.replace(/\n/g, '<br>') + '</p>').join('\n');
+  return h;
+}
+
+/* ---------- 首页：课程广场 ---------- */
+async function loadCourses() {
+  const d = await req(`${API}/course/catalog?userId=${uid}`);
+  const box = document.getElementById('courses');
+  box.innerHTML = '';
+  (d.data || []).forEach(c => {
+    box.insertAdjacentHTML('beforeend', `
+      <div class="card course-card" onclick="openCourse(${c.id})">
+        <div class="course-cover">${c.cover}</div>
+        <span class="course-level">${c.level}</span>
+        <h3>${c.title}</h3>
+        <div class="meta">${c.summary}</div>
+        <div class="course-tags">${String(c.tags).split(',').map(t => `<span>${t}</span>`).join('')}</div>
+        <div class="bar"><i style="width:${c.progress}%"></i></div>
+        <span class="pct">${c.progress}% · ${c.learned}/${c.section_count} 章 · 约 ${c.duration_h} 小时</span>
+      </div>`);
+  });
+  document.getElementById('st-courses').textContent = (d.data || []).filter(c => c.progress > 0 && c.progress < 100).length || (d.data || []).length;
+}
+
+async function openCourse(courseId) {
+  curCourseId = courseId;
+  go('course');
+  const d = await req(`${API}/course/detail?courseId=${courseId}&userId=${uid}`);
+  const c = d.data;
+  const secs = c.sections.map(s => `
+    <div class="sec-item ${s.finished ? 'done' : ''}" onclick="openSection(${s.id})">
+      <div class="idx">${s.finished ? '✓' : s.idx}</div>
+      <div class="t"><b>${s.title}</b><p>预计 ${s.minutes} 分钟${s.finished ? ' · 已完成' : ''}</p></div>
+      <div class="flag">${s.finished ? '✅' : '▶'}</div>
+    </div>`).join('');
+  document.getElementById('course-detail').innerHTML = `
+    <div class="detail-head">
+      <div class="cover">${c.cover}</div>
+      <div class="info">
+        <h2>${c.title}</h2>
+        <div class="summary">${c.summary}</div>
+        <div style="font-size:13px;color:var(--muted)">
+          难度 <span style="color:var(--gold)">${c.level}</span> ·
+          共 ${c.sectionCount} 章 · 已完成 ${c.learnedCount} 章 ·
+          预计 ${c.duration_h} 小时
+        </div>
+        <div class="bar" style="margin-top:12px"><i style="width:${c.progress}%"></i></div>
+        <span class="pct">总进度 ${c.progress}%</span>
+      </div>
+    </div>
+    <h2 style="margin-top:24px">课程大纲（点击章节开始学习）</h2>
+    ${secs}`;
+}
+
+/* ---------- 章节阅读 ---------- */
+let curSectionId = null, curQuiz = null;
+async function openSection(sectionId) {
+  curSectionId = sectionId;
+  go('section');
+  const d = await req(`${API}/course/section?sectionId=${sectionId}&userId=${uid}`);
+  const s = d.data;
+  curQuiz = null;
+  try { curQuiz = s.quiz ? JSON.parse(s.quiz) : null; } catch (e) {}
+
+  document.getElementById('section-reader').innerHTML = `
+    <div class="reader">
+      <h2>第 ${s.idx} 章 · ${s.title}</h2>
+      <div class="sub">${s.course_title} · 预计 ${s.minutes} 分钟 · ${s.finished ? '✅ 已完成' : '📖 学习中'}</div>
+      <div class="md">${md(s.content)}</div>
+      ${curQuiz ? `
+        <div class="quiz">
+          <h4>📝 随堂小测</h4>
+          <div style="font-size:14px;margin-bottom:12px">${esc(curQuiz.q)}</div>
+          <div id="quiz-opts">${curQuiz.options.map((o, i) =>
+              `<div class="opt" onclick="answerQuiz(${i})">${String.fromCharCode(65 + i)}. ${esc(o)}</div>`).join('')}</div>
+          <div id="quiz-result"></div>
+        </div>` : ''}
+      <div class="reader-acts">
+        <button onclick="finishSection(${s.idx})">${s.finished ? '✅ 已完成（可重复巩固）' : '完成本章学习 ✓'}</button>
+      </div>
+    </div>`;
+  window.scrollTo(0, 0);
+}
+
+function answerQuiz(i) {
+  if (!curQuiz) return;
+  const right = curQuiz.answer;
+  document.querySelectorAll('#quiz-opts .opt').forEach((el, idx) => {
+    el.classList.remove('right', 'wrong');
+    if (idx === right) el.classList.add('right');
+    if (idx === i && i !== right) el.classList.add('wrong');
+  });
+  const res = document.getElementById('quiz-result');
+  if (i === right) {
+    res.innerHTML = '<div class="result ok">✅ 回答正确！可以直接点击下方按钮完成本章学习。</div>';
+  } else {
+    res.innerHTML = `<div class="result no">❌ 再想想～ 正确答案是 ${String.fromCharCode(65 + right)}。回顾上文找找线索。</div>`;
+  }
+}
+
+/* 完成章节：走真实学习链路（写进度 → 落库 → 加积分 → 徽章） */
+async function finishSection(idx) {
+  // 找到该课程对应的我的课表 lessonId
+  const ld = await req(`${API}/learning/lessons?userId=${uid}`);
+  const lesson = (ld.data || []).find(l => l.course_id === curCourseId);
+  if (!lesson) {
+    // 自动加入课表
+    const cd = await req(`${API}/course/detail?courseId=${curCourseId}&userId=${uid}`);
+    await fetch(`${API}/learning/join?userId=${uid}&courseId=${curCourseId}&courseName=${encodeURIComponent(cd.data.title)}&sectionCount=${cd.data.sectionCount}`, {method: 'POST'});
+    return finishSection(idx);   // 加入后重试
+  }
+  const d = await req(`${API}/learning/records`, {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({userId: uid, lessonId: lesson.id, sectionId: idx, sectionType: 1, moment: idx * 20, finished: true})
+  });
+  if (d.code === 200) {
+    toast('✅ 本章完成！学习进度已记录，积分 +2，5 秒后生效');
+    setTimeout(() => { openCourse(curCourseId); loadRank(); }, 5500);
+  } else {
+    toast(d.msg || '记录失败', true);
+  }
+}
+
+/* ---------- Agent ---------- */
+async function loadDiag() {
+  const d = await req(`${API}/agent/diagnose?userId=${uid}`);
+  const p = d.data.profile;
+  document.getElementById('agent-diag').innerHTML = `
+    <div class="diag-grid">
+      <div class="item"><b>${p.enrolledCourses}</b><span>在学课程</span></div>
+      <div class="item"><b>${p.progressPct}%</b><span>总进度</span></div>
+      <div class="item"><b>${p.finishedSections}</b><span>完成章节</span></div>
+      <div class="item"><b>${p.streakCurrent}天</b><span>连续打卡</span></div>
+      <div class="item"><b>${p.points}</b><span>总积分</span></div>
+      <div class="item"><b>${p.noteCount}</b><span>笔记数</span></div>
+      <div class="item"><b>${p.recent7dSections}</b><span>近7天完成</span></div>
+    </div>
+    <b style="color:var(--teal)">🔍 诊断发现</b>
+    <ul class="diag-list">${(d.data.findings || []).map(f => '<li>' + f + '</li>').join('')}</ul>
+    <b style="color:var(--gold);display:block;margin:14px 0 8px">💡 学习建议</b>
+    <ul class="diag-list">${(d.data.suggestions || []).map(s => '<li>' + s + '</li>').join('')}</ul>
+    <b style="color:var(--gold);display:block;margin:14px 0 8px">🎯 下一步</b>
+    <div class="agent-answer">${esc(d2s(await req(`${API}/agent/next?userId=${uid}`)))}</div>`;
+}
+function d2s(d) {
+  if (!d.data) return '暂无';
+  if (d.data.tip) return d.data.tip;
+  return `建议学习：${d.data.courseName || ''} → 第 ${d.data.sectionIdx} 章「${d.data.sectionTitle}」（约 ${d.data.minutes} 分钟）`;
+}
+async function quickAsk(q) { document.getElementById('agent-input').value = q; askAgent(); }
+async function askAgent() {
+  const q = document.getElementById('agent-input').value.trim();
+  if (!q) return;
+  const box = document.getElementById('agent-result');
+  box.innerHTML = '<div class="agent-answer">🤖 思考中…</div>';
+  const d = await req(`${API}/agent/ask?userId=${uid}`, {
+    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({question: q})
+  });
+  let html = '<div class="agent-answer">' + esc(d.data.answer) + '</div>';
+  if (d.data.sectionId) {
+    html += `<div style="margin-top:12px"><button onclick="openSection(${d.data.sectionId})">📖 去读相关章节</button></div>`;
+  }
+  box.innerHTML = html;
+}
+
+/* ---------- 优惠券 / 排行 ---------- */
+async function loadCoupons() {
+  const d = await req(`${API}/coupon/mine?userId=${uid}`);
+  const box = document.getElementById('coupons');
+  box.innerHTML = '';
+  const mine = new Set((d.data || []).map(c => c.id));
+  (d.data || []).forEach(c => {
+    box.insertAdjacentHTML('beforeend', `
+      <div class="card coupon-row">
+        <div class="amt" style="font-size:24px;font-weight:bold;color:var(--gold);min-width:120px;text-align:center">已持有<small style="display:block;font-size:11px;color:var(--muted)">${c.name}</small></div>
+        <div style="flex:1"><b>${c.name}</b><p style="font-size:12px;color:var(--muted);margin-top:4px">剩余库存 ${c.remain_num ?? c.remainNum ?? '-'} 张</p></div>
+      </div>`);
+  });
+  for (let i = 1; i <= 4; i++) {
+    if (!mine.has(i)) {
+      box.insertAdjacentHTML('beforeend', `
+        <div class="card coupon-row">
+          <div class="amt" style="font-size:24px;color:var(--gold);min-width:120px;text-align:center">🎁<small style="display:block;font-size:11px;color:var(--muted)">星途券 #${i}</small></div>
+          <div style="flex:1"><b>可领取的优惠券</b><p style="font-size:12px;color:var(--muted);margin-top:4px">Lua 原子扣减库存，一人一张</p></div>
+          <button style="width:92px" onclick="receive(${i})">领取</button>
+        </div>`);
+    }
+  }
+  document.getElementById('st-coupons').textContent = (d.data || []).length;
+}
+async function receive(id) {
+  const d = await req(`${API}/coupon/${id}/receive?userId=${uid}`, {method: 'POST'});
+  toast(d.code === 200 ? '领取成功！' : (d.msg || '领取失败'), d.code !== 200);
+  if (d.code === 200) setTimeout(loadCoupons, 600);
+}
+async function loadRank() {
+  const d = await req(`${API}/points/rank?topN=8`);
+  const box = document.getElementById('rank');
+  box.innerHTML = '';
+  (d.data || []).forEach(r => {
+    box.insertAdjacentHTML('beforeend', `
+      <div style="display:flex;align-items:center;padding:12px 20px;background:var(--card);border:1px solid var(--card-line);border-radius:10px;margin-bottom:10px;gap:16px">
+        <div class="sec-item .idx" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:${r.rank === 1 ? 'linear-gradient(135deg,#F0B429,#E8940F)' : r.rank === 2 ? 'linear-gradient(135deg,#B9C6D2,#8FA2B3)' : r.rank === 3 ? 'linear-gradient(135deg,#D8946A,#B77348)' : '#1B3A55'};color:${r.rank <= 3 ? '#1a1a1a' : 'var(--muted)'};font-weight:bold">${r.rank}</div>
+        <div style="flex:1">学习者 #${r.userId}</div>
+        <div style="color:var(--gold);font-weight:bold">${r.points} 分</div>
+      </div>`);
+  });
+  const me = (d.data || []).find(r => r.userId === uid);
+  document.getElementById('st-points').textContent = me ? me.points : 0;
+}
+
+/* ---------- 笔记 / 打卡 / 徽章（沿用） ---------- */
+async function loadNotes() {
+  const ld = await req(`${API}/learning/lessons?userId=${uid}`);
+  document.getElementById('note-lesson').innerHTML = (ld.data || []).map(c =>
+      `<option value="${l2v(c)}">${c.course_name}</option>`).join('');
+  async function l2v(c) { return c.id; }
+  // 上面 map 里无法 await，用同步取 id
+  document.getElementById('note-lesson').innerHTML = (ld.data || []).map(c =>
+      `<option value="${c.id}">${c.course_name}</option>`).join('');
+
+  const d = await req(`${API}/note/mine?userId=${uid}`);
+  const box = document.getElementById('my-notes');
+  box.innerHTML = '';
+  if (!d.data || !d.data.length) { box.innerHTML = '<div class="card">还没有笔记，写下第一篇吧 ✍️</div>'; }
+  else for (const n of d.data) {
+    box.insertAdjacentHTML('beforeend', `
+      <div class="card" style="border-left:3px solid ${n.is_public ? 'var(--gold)' : 'var(--teal)'}">
+        <div class="meta">课程#${n.lesson_id} · 小节${n.section_id} ${n.is_public ? '· 🌐公开' : '· 🔒私密'} · ${String(n.create_time).replace('T', ' ').slice(0, 16)}</div>
+        <div style="font-size:14px;line-height:1.7;color:#cfe4e8;white-space:pre-wrap">${esc(n.content)}</div>
+        <div style="margin-top:10px"><button class="ghost" style="padding:6px 16px;font-size:12px" onclick="delNote(${n.id})">删除</button></div>
+      </div>`);
+  }
+  const p = await req(`${API}/note/public?limit=10`);
+  const pbox = document.getElementById('public-notes');
+  pbox.innerHTML = '';
+  if (!p.data || !p.data.length) { pbox.innerHTML = '<div class="card">广场还很安静 🌐</div>'; }
+  else for (const n of p.data) {
+    pbox.insertAdjacentHTML('beforeend', `
+      <div class="card" style="border-left:3px solid var(--gold)">
+        <div class="meta">学习者 #${n.user_id} · 课程#${n.lesson_id} · 小节${n.section_id} · ${String(n.create_time).replace('T', ' ').slice(0, 16)}</div>
+        <div style="font-size:14px;line-height:1.7;color:#cfe4e8;white-space:pre-wrap">${esc(n.content)}</div>
+      </div>`);
+  }
+}
+async function saveNote() {
+  const lessonId = document.getElementById('note-lesson').value;
+  const sectionId = document.getElementById('note-section').value || 1;
+  const content = document.getElementById('note-content').value.trim();
+  const isPublic = document.getElementById('note-public').checked ? 1 : 0;
+  if (!content) { toast('先写点内容再保存', true); return; }
+  const d = await req(`${API}/note/create?userId=${uid}&lessonId=${lessonId}&sectionId=${sectionId}&content=${encodeURIComponent(content)}&isPublic=${isPublic}`, {method: 'POST'});
+  toast(d.code === 200 ? '笔记已保存 ✅' : (d.msg || '保存失败'), d.code !== 200);
+  if (d.code === 200) { document.getElementById('note-content').value = ''; loadNotes(); }
+}
+async function delNote(id) {
+  const d = await req(`${API}/note/delete?userId=${uid}&noteId=${id}`, {method: 'DELETE'});
+  toast(d.code === 200 ? '已删除' : (d.msg || '删除失败'), d.code !== 200);
+  if (d.code === 200) loadNotes();
+}
+async function loadStreak() {
+  const s = await req(`${API}/streak/status?userId=${uid}`);
+  document.getElementById('streak-cur').textContent = s.data.currentStreak ?? 0;
+  document.getElementById('streak-best').textContent = s.data.bestStreak ?? 0;
+  const btn = document.getElementById('btn-checkin');
+  btn.disabled = !!s.data.todayChecked;
+  btn.textContent = s.data.todayChecked ? '今日已打卡 ✓' : '立即打卡';
+  const cal = await req(`${API}/streak/calendar?userId=${uid}&days=30`);
+  const days = new Set((cal.data || []).map(r => String(r.d).slice(0, 10)));
+  const box = document.getElementById('calendar');
+  box.innerHTML = '';
+  const today = new Date();
+  for (let i = 29; i >= 0; i--) {
+    const dt = new Date(today); dt.setDate(dt.getDate() - i);
+    const key = dt.toISOString().slice(0, 10);
+    box.insertAdjacentHTML('beforeend', `<div style="aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:${days.has(key) ? 'linear-gradient(135deg,var(--teal-deep),var(--teal))' : 'var(--card)'};border:1px solid var(--card-line);border-radius:8px;font-size:11px;color:${days.has(key) ? '#fff' : 'var(--muted)'}">${dt.getMonth() + 1}/${dt.getDate()}</div>`);
+  }
+}
+async function checkIn() {
+  const d = await req(`${API}/streak/checkin?userId=${uid}`, {method: 'POST'});
+  toast(d.data?.tip || d.msg || '打卡结果');
+  loadStreak(); loadRank();
+}
+async function loadBadges() {
+  const d = await req(`${API}/badge/my?userId=${uid}`);
+  const icons = {star: '⭐', award: '🏅', fire: '🔥', flame: '💥', ten: '🔟', ticket: '🎟️'};
+  const box = document.getElementById('badges');
+  box.innerHTML = (d.data || []).map(b => `
+    <div class="card" style="text-align:center;padding:24px 16px">
+      <div style="font-size:40px;margin-bottom:8px;${b.owned ? '' : 'filter:grayscale(1);opacity:.35'}">${icons[b.icon] || '⭐'}</div>
+      <h3 style="font-size:15px">${b.name}</h3>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">${b.description}</div>
+      <div style="display:inline-block;margin-top:10px;padding:3px 14px;border-radius:12px;font-size:12px;${b.owned ? 'background:rgba(20,184,166,.14);color:var(--teal)' : 'border:1px dashed var(--card-line);color:var(--muted)'}">${b.owned ? '已达成' : '未解锁'}</div>
+    </div>`).join('');
+  const r = await req(`${API}/badge/recent?userId=${uid}&limit=10`);
+  const rbox = document.getElementById('badge-recent');
+  rbox.innerHTML = (!r.data || !r.data.length)
+      ? '<div style="padding:12px 20px;background:var(--card);border:1px solid var(--card-line);border-radius:10px">还没有获得徽章，去学习打卡解锁吧 💪</div>'
+      : r.data.map(b => `
+      <div style="display:flex;align-items:center;padding:12px 20px;background:var(--card);border:1px solid var(--card-line);border-radius:10px;margin-bottom:10px;gap:14px">
+        <div style="font-size:22px">${icons[b.icon] || '⭐'}</div>
+        <div style="flex:1"><b>${b.name}</b>　<span style="color:var(--muted);font-size:13px">${b.description}</span></div>
+        <div style="font-size:12px;color:var(--muted)">${String(b.create_time).replace('T', ' ').slice(0, 16)}</div>
+      </div>`).join('');
+}
+
+function loadAll() { loadCourses(); loadCoupons(); loadRank(); loadDiag(); }
+loadAll();
+</script>
+</body>
+</html>

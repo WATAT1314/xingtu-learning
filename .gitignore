@@ -1,0 +1,28 @@
+# 编译产物
+target/
+*.class
+*.jar
+*.war
+
+# 日志
+*.log
+logs/
+app.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 本地覆盖配置
+application-local.yml
+
+# 本地 git 历史备份（不提交）
+.git.bak-*/
